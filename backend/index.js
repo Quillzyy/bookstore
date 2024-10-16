@@ -13,10 +13,13 @@ app.get("/", (req, res) => {
     return res.status(200).send("Hello World");
 });
 
+// Create a new book
 app.post("/books", async (req, res) => {
     try {
         if (!req.body.title || !req.body.author || !req.body.publishYear) {
-            return res.status(400).send("Please fill all required fields");
+            return res
+                .status(400)
+                .send({ message: "Please fill all required fields" });
         }
         const newBook = {
             title: req.body.title,
@@ -29,20 +32,74 @@ app.post("/books", async (req, res) => {
         return res.status(201).send(book);
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send(error.message);
+        return res.status(500).send({ message: error.message });
     }
 });
 
+// Get all books
 app.get("/books", async (req, res) => {
     try {
         const books = await Book.find({});
+
         return res.status(200).json({
             count: books.length,
             data: books,
         });
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send(error.message);
+        return res.status(500).send({ message: error.message });
+    }
+});
+
+// Get a single book by id
+app.get("/books/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const books = await Book.find({ _id: id });
+
+        return res.status(200).json({
+            count: books.length,
+            data: books,
+        });
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send({ message: error.message });
+    }
+});
+
+// Update a book by id
+app.put("/books/:id", async (req, res) => {
+    try {
+        if (!req.body.title || !req.body.author || !req.body.publishYear) {
+            return res
+                .status(400)
+                .send({ message: "Please fill all required fields" });
+        }
+        const { id } = req.params;
+        const result = await Book.findByIdAndUpdate(id, req.body);
+
+        return res.status(200).send({ message: "Book updated successfully" });
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send({ message: error.message });
+    }
+});
+
+// Delete a book by id
+app.delete("/books/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await Book.deleteOne({ _id: id });
+        if (result.ok === 0) {
+            return res.status(404).send({ message: "Book not found" });
+        } else {
+            return res
+                .status(200)
+                .send({ message: "Book deleted successfully" });
+        }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send({ message: error.message });
     }
 });
 
