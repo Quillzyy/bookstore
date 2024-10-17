@@ -17,13 +17,13 @@ const ShowBook = () => {
             .then((response) => {
                 setBook(response.data);
                 setLoading(false);
-                console.log(response.data);
+                // console.log(response.data);
             })
             .catch((error) => {
                 console.log(error);
                 setLoading(false);
             });
-    }, [id]);
+    }, []);
 
     return (
         <div className="p-4">
